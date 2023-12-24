@@ -5,7 +5,6 @@ package generated
 import (
 	"bytes"
 	"context"
-	"embed"
 	"errors"
 	"fmt"
 	"graphql-api/graph/model"
@@ -260,18 +259,39 @@ func (ec *executionContext) introspectType(name string) (*introspection.Type, er
 	return introspection.WrapTypeFromDef(ec.Schema(), ec.Schema().Types[name]), nil
 }
 
-var sourcesFS embed.FS
+var sources = []*ast.Source{
+	{Name: "../../../schema/schema.graphqls", Input: `type Query
+type Mutation
+`, BuiltIn: false},
+	{Name: "../../../schema/todo.graphqls", Input: `# GraphQL schema example
+#
+# https://gqlgen.com/getting-started/
 
-func sourceData(filename string) string {
-	data, err := sourcesFS.ReadFile(filename)
-	if err != nil {
-		panic(fmt.Sprintf("codegen problem: %s not available", filename))
-	}
-	return string(data)
+type Todo {
+  id: ID!
+  text: String!
+  done: Boolean!
+  user: User!
 }
 
-var sources = []*ast.Source{
-	{Name: "schema.graphqls", Input: sourceData("schema.graphqls"), BuiltIn: false},
+extend type Query {
+  todos: [Todo!]!
+}
+
+input NewTodo {
+  text: String!
+  userId: String!
+}
+
+extend type Mutation {
+  createTodo(input: NewTodo!): Todo!
+}
+`, BuiltIn: false},
+	{Name: "../../../schema/user.graphqls", Input: `type User {
+  id: ID!
+  name: String!
+}
+`, BuiltIn: false},
 }
 var parsedSchema = gqlparser.MustLoadSchema(sources...)
 

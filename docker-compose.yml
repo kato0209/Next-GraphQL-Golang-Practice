@@ -1,0 +1,39 @@
+services:
+  backend:
+    build:
+      context: ./graphql-api
+      dockerfile: "Dockerfile"
+    working_dir: "/graphql-api"
+    volumes:
+      - ./graphql-api:/graphql-api
+    ports:
+      - "8080:8080"
+    environment:
+      - PGHOST=db
+      - PGDATABASE=graphql-api-db
+      - PGUSER=root
+      - PGPASSWORD=p@ssword
+      - PGSSLMODE=disable
+      - PGPORT=5432
+    depends_on:
+      - db
+
+  db:
+    image: postgres:15.3
+    restart: always
+    environment:
+      - POSTGRES_USER=root
+      - POSTGRES_PASSWORD=p@ssword
+      - POSTGRES_DB=graphql-api-db
+      - PGDATA=/var/lib/postgresql/data/pgdata
+      - TZ=Asia/Tokyo
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./db/data/postgresql:/var/lib/postgresql/data
+      - ./db/data/logs:/var/log
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U root -d graphql-api-db"]
+      interval: 5s
+      timeout: 30s
+      retries: 5
