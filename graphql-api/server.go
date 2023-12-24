@@ -30,9 +30,10 @@ func main() {
 	}
 	defer db.Close()
 
-	iRepository := repository.NewTodoRepository(db)
-	iTodoUsecase := usecase.NewTodoUsecase(iRepository)
-	resolver := resolver.NewResolver(&iTodoUsecase)
+	iTodoRepository := repository.NewTodoRepository(db)
+	iUserRepository := repository.NewUserRepository(db)
+	iTodoUsecase := usecase.NewTodoUsecase(iTodoRepository, iUserRepository)
+	resolver := resolver.NewResolver(iTodoUsecase)
 	srv := handler.NewDefaultServer(generated.NewExecutableSchema(generated.Config{Resolvers: resolver}))
 
 	http.Handle("/", playground.Handler("GraphQL playground", "/query"))
