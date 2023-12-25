@@ -6,7 +6,6 @@ package resolver
 
 import (
 	"context"
-	"fmt"
 	"graphql-api/entity"
 	"graphql-api/graph/model"
 	"strconv"
@@ -49,5 +48,23 @@ func (r *mutationResolver) CreateTodo(ctx context.Context, input model.NewTodo) 
 
 // Todos is the resolver for the todos field.
 func (r *queryResolver) Todos(ctx context.Context) ([]*model.Todo, error) {
-	panic(fmt.Errorf("not implemented: Todos - todos"))
+	todos, err := r.tu.GetAllTodos(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	resTodos := []*model.Todo{}
+	for _, todo := range todos {
+		resTodos = append(resTodos, &model.Todo{
+			ID:   strconv.Itoa(todo.TodoID),
+			Text: todo.Text,
+			Done: todo.Done,
+			User: &model.User{
+				ID:   strconv.Itoa(todo.User.UserID),
+				Name: todo.User.Name,
+			},
+		})
+	}
+
+	return resTodos, nil
 }

@@ -10,6 +10,7 @@ import (
 
 type ITodoUsecase interface {
 	CreateTodo(ctx context.Context, todo *entity.Todo) error
+	GetAllTodos(ctx context.Context) ([]entity.Todo, error)
 }
 
 type todoUsecase struct {
@@ -35,4 +36,15 @@ func (tu *todoUsecase) CreateTodo(ctx context.Context, todo *entity.Todo) error 
 	todo.User = user
 
 	return nil
+}
+
+func (tu *todoUsecase) GetAllTodos(ctx context.Context) ([]entity.Todo, error) {
+
+	todos := []entity.Todo{}
+	err := tu.tr.GetAllTodos(ctx, &todos)
+	if err != nil {
+		return nil, errors.WithStack(err)
+	}
+
+	return todos, nil
 }
