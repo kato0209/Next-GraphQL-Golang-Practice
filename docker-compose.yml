@@ -37,3 +37,12 @@ services:
       interval: 5s
       timeout: 30s
       retries: 5
+  web:
+    image: "node:19.8.1-buster-slim"
+    container_name: web
+    working_dir: /next-graphql-golang
+    volumes:
+      - ./next-graphql-golang:/next-graphql-golang
+    command: sh -c "npm run dev"
+    ports:
+      - "3000:3000"

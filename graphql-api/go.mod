@@ -7,6 +7,8 @@ require (
 	github.com/cockroachdb/errors v1.11.1
 	github.com/jmoiron/sqlx v1.3.5
 	github.com/lib/pq v1.2.0
+	github.com/pkg/errors v0.9.1
+	github.com/rs/cors v1.10.1
 	github.com/vektah/gqlparser/v2 v2.5.10
 	golang.org/x/exp v0.0.0-20231219180239-dc181d75b848
 )
@@ -24,7 +26,6 @@ require (
 	github.com/kr/pretty v0.3.1 // indirect
 	github.com/kr/text v0.2.0 // indirect
 	github.com/mitchellh/mapstructure v1.5.0 // indirect
-	github.com/pkg/errors v0.9.1 // indirect
 	github.com/rogpeppe/go-internal v1.9.0 // indirect
 	github.com/russross/blackfriday/v2 v2.1.0 // indirect
 	github.com/sosodev/duration v1.1.0 // indirect
