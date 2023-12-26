@@ -1,5 +1,5 @@
-mutation createTodo {
-  createTodo(input: { text: "todo", userId: "1" }) {
+mutation CreateTodo($text: String!, $userId: ID!) {
+  createTodo(input: { text: $text, userId: $userId }) {
     user {
       id
     }

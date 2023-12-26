@@ -29,7 +29,7 @@ export type MutationCreateTodoArgs = {
 
 export type NewTodo = {
   text: Scalars['String']['input'];
-  userId: Scalars['String']['input'];
+  userId: Scalars['ID']['input'];
 };
 
 export type Query = {
@@ -51,7 +51,10 @@ export type User = {
   name: Scalars['String']['output'];
 };
 
-export type CreateTodoMutationVariables = Exact<{ [key: string]: never; }>;
+export type CreateTodoMutationVariables = Exact<{
+  text: Scalars['String']['input'];
+  userId: Scalars['ID']['input'];
+}>;
 
 
 export type CreateTodoMutation = { __typename?: 'Mutation', createTodo: { __typename?: 'Todo', text: string, done: boolean, user: { __typename?: 'User', id: string } } };
@@ -63,8 +66,8 @@ export type GetTodoQuery = { __typename?: 'Query', todos: Array<{ __typename?: '
 
 
 export const CreateTodoDocument = gql`
-    mutation createTodo {
-  createTodo(input: {text: "todo", userId: "1"}) {
+    mutation CreateTodo($text: String!, $userId: ID!) {
+  createTodo(input: {text: $text, userId: $userId}) {
     user {
       id
     }
@@ -89,8 +92,8 @@ const defaultWrapper: SdkFunctionWrapper = (action, _operationName, _operationTy
 
 export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = defaultWrapper) {
   return {
-    createTodo(variables?: CreateTodoMutationVariables, requestHeaders?: GraphQLClientRequestHeaders): Promise<CreateTodoMutation> {
-      return withWrapper((wrappedRequestHeaders) => client.request<CreateTodoMutation>(CreateTodoDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'createTodo', 'mutation', variables);
+    CreateTodo(variables: CreateTodoMutationVariables, requestHeaders?: GraphQLClientRequestHeaders): Promise<CreateTodoMutation> {
+      return withWrapper((wrappedRequestHeaders) => client.request<CreateTodoMutation>(CreateTodoDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'CreateTodo', 'mutation', variables);
     },
     getTodo(variables?: GetTodoQueryVariables, requestHeaders?: GraphQLClientRequestHeaders): Promise<GetTodoQuery> {
       return withWrapper((wrappedRequestHeaders) => client.request<GetTodoQuery>(GetTodoDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getTodo', 'query', variables);
