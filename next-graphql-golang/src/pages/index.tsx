@@ -120,7 +120,7 @@ const Home: NextPage = () => {
               justifyContent: 'center',
             }}
           >
-            <h3>{todo.text},{todo.id}</h3>
+            <h3>{todo.text}</h3>
             <IconButton onClick={(e) => handleUpdateDialogOpen(e, todo.id)}>
               <EditIcon />
             </IconButton>

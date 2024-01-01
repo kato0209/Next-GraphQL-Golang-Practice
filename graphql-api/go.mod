@@ -5,11 +5,13 @@ go 1.21.1
 require (
 	github.com/99designs/gqlgen v0.17.41
 	github.com/cockroachdb/errors v1.11.1
+	github.com/golang-jwt/jwt v3.2.2+incompatible
 	github.com/jmoiron/sqlx v1.3.5
 	github.com/lib/pq v1.2.0
 	github.com/pkg/errors v0.9.1
 	github.com/rs/cors v1.10.1
 	github.com/vektah/gqlparser/v2 v2.5.10
+	golang.org/x/crypto v0.0.0-20220926161630-eccd6366d1be
 	golang.org/x/exp v0.0.0-20231219180239-dc181d75b848
 )
 

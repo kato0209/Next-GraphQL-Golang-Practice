@@ -34,7 +34,8 @@ func main() {
 	iTodoRepository := repository.NewTodoRepository(db)
 	iUserRepository := repository.NewUserRepository(db)
 	iTodoUsecase := usecase.NewTodoUsecase(iTodoRepository, iUserRepository)
-	resolver := resolver.NewResolver(iTodoUsecase)
+	iUserUsecase := usecase.NewUserUsecase(iUserRepository)
+	resolver := resolver.NewResolver(iTodoUsecase, iUserUsecase)
 	srv := handler.NewDefaultServer(generated.NewExecutableSchema(generated.Config{Resolvers: resolver}))
 
 	c := cors.New(cors.Options{

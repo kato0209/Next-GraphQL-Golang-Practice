@@ -2,3 +2,22 @@ type User {
   id: ID!
   name: String!
 }
+
+input NewUser {
+  name: String!
+  email: String!
+  password: String!
+}
+
+extend type Mutation {
+  createUser(input: NewUser!): User!
+}
+
+input LoginUser {
+  email: String!
+  password: String!
+}
+
+extend type Mutation {
+  login(input: LoginUser!): User!
+}
