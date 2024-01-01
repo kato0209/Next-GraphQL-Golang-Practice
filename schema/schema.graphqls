@@ -1,2 +1,4 @@
+directive @isAuthenticated on FIELD_DEFINITION
+
 type Query
 type Mutation

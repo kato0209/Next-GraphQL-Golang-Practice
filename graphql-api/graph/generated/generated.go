@@ -43,6 +43,7 @@ type ResolverRoot interface {
 }
 
 type DirectiveRoot struct {
+	IsAuthenticated func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
 }
 
 type ComplexityRoot struct {
@@ -318,7 +319,9 @@ func (ec *executionContext) introspectType(name string) (*introspection.Type, er
 }
 
 var sources = []*ast.Source{
-	{Name: "../../../schema/schema.graphqls", Input: `type Query
+	{Name: "../../../schema/schema.graphqls", Input: `directive @isAuthenticated on FIELD_DEFINITION
+
+type Query
 type Mutation
 `, BuiltIn: false},
 	{Name: "../../../schema/todo.graphqls", Input: `# GraphQL schema example
