@@ -12,6 +12,7 @@ type ITodoUsecase interface {
 	CreateTodo(ctx context.Context, todo *entity.Todo) error
 	GetAllTodos(ctx context.Context) ([]entity.Todo, error)
 	UpdateTodo(ctx context.Context, todo *entity.Todo) error
+	DeleteTodo(ctx context.Context, todoID int) error
 }
 
 type todoUsecase struct {
@@ -52,6 +53,15 @@ func (tu *todoUsecase) GetAllTodos(ctx context.Context) ([]entity.Todo, error) {
 
 func (tu *todoUsecase) UpdateTodo(ctx context.Context, todo *entity.Todo) error {
 	err := tu.tr.UpdateTodoByTodoID(ctx, todo)
+	if err != nil {
+		return errors.WithStack(err)
+	}
+
+	return nil
+}
+
+func (tu *todoUsecase) DeleteTodo(ctx context.Context, todoID int) error {
+	err := tu.tr.DeleteTodoByTodoID(ctx, todoID)
 	if err != nil {
 		return errors.WithStack(err)
 	}

@@ -1,23 +1,25 @@
 import type { NextPage } from "next";
 import * as React from 'react';
 import { useQuery, useMutation  } from "@apollo/client";
-import { CreateTodoMutation, GetTodoDocument, GetTodoQuery, CreateTodoDocument, UpdateTodoTextDocument, UpdateTodoTextMutation } from "../graphql/generated/graphql";
+import { CreateTodoMutation, GetTodoDocument, GetTodoQuery, CreateTodoDocument, UpdateTodoTextDocument, UpdateTodoTextMutation, DeleteTodoDocument, DeleteTodoMutation } from "../graphql/generated/graphql";
 import { Box } from "@mui/material";
 import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
 import EditIcon from '@mui/icons-material/Edit';
 import IconButton from '@mui/material/IconButton';
 import { Menu, MenuItem } from '@mui/material';
+import DeleteIcon from '@mui/icons-material/Delete';
 
 const Home: NextPage = () => {
   const { data, refetch  } = useQuery<GetTodoQuery>(GetTodoDocument);
   const [input, setInput] = React.useState<string>('');
-  const [createTodo, { loading, error }] = useMutation<CreateTodoMutation>(CreateTodoDocument);
-  const [todoAnchorEl, setTodoAnchorEl] = React.useState<null | HTMLElement>(null);
+  const [updateTodoAnchorEl, setUpdateTodoAnchorEl] = React.useState<null | HTMLElement>(null);
   const [updateInput, setUpdateInput] = React.useState<string>('');
-  const [updateTodo, { loading: updateLoading, error: updateError }] = useMutation<UpdateTodoTextMutation>(UpdateTodoTextDocument);
   const [selectedUpdateTodoID, setSelectedUpdateTodoID] = React.useState<string>("");
   
+  const [createTodo, { loading: createLoading, error: createError }] = useMutation<CreateTodoMutation>(CreateTodoDocument);
+  const [updateTodo, { loading: updateLoading, error: updateError }] = useMutation<UpdateTodoTextMutation>(UpdateTodoTextDocument);
+  const [deleteTodo, { loading: deleteLoading, error: deleteError }] = useMutation<DeleteTodoMutation>(DeleteTodoDocument);
 
   const handleCreateTodo = async () => {
     await createTodo({
@@ -30,12 +32,12 @@ const Home: NextPage = () => {
   }
 
   const handleUpdateDialogOpen  = (event: React.MouseEvent<HTMLElement>, todoID: string) => {
-    setTodoAnchorEl(event.currentTarget);
+    setUpdateTodoAnchorEl(event.currentTarget);
     setSelectedUpdateTodoID(todoID);
   };
 
   const handleUpdateDialogClose = () => {
-    setTodoAnchorEl(null);
+    setUpdateTodoAnchorEl(null);
     setSelectedUpdateTodoID("");
   };
 
@@ -49,10 +51,21 @@ const Home: NextPage = () => {
     });
   }
 
-  if (loading) return 'Creating todo...';
-  if (error) return `Creation error! ${error.message}`;
+  const handleDeleteTodo = async (todoID: string) => {
+    await deleteTodo({
+      variables: {
+        todoId: todoID,
+      },
+    });
+    await refetch();
+  }
+
+  if (createLoading) return 'Creating todo...';
+  if (createError) return `Creation error! ${createError.message}`;
   if (updateLoading) return 'Updating todo...';
   if (updateError) return `Updating error! ${updateError.message}`;
+  if (deleteLoading) return 'Deleting todo...';
+  if (deleteError) return `Deleting error! ${deleteError.message}`;
 
   return (
     <Box component="main" sx={{display: "flex",flexDirection: "column", textAlign: "center"}}>
@@ -111,14 +124,16 @@ const Home: NextPage = () => {
             <IconButton onClick={(e) => handleUpdateDialogOpen(e, todo.id)}>
               <EditIcon />
             </IconButton>
+            <IconButton onClick={() => handleDeleteTodo(todo.id)}>
+              <DeleteIcon />
+            </IconButton>
             <Menu 
-              anchorEl={todoAnchorEl}
-              open={Boolean(todoAnchorEl)} 
+              anchorEl={updateTodoAnchorEl}
+              open={Boolean(updateTodoAnchorEl)} 
               onClose={handleUpdateDialogClose}
               sx={{
                 
                 '& .MuiPaper-root': {
-                    
                     boxShadow: 'none', 
                     border: '1px solid #ccc',
                 },

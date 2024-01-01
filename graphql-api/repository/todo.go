@@ -12,6 +12,7 @@ type ITodoRepository interface {
 	CreateTodo(ctx context.Context, todo *entity.Todo) error
 	GetAllTodos(ctx context.Context, todos *[]entity.Todo) error
 	UpdateTodoByTodoID(ctx context.Context, todo *entity.Todo) error
+	DeleteTodoByTodoID(ctx context.Context, todoID int) error
 }
 
 type todoRepository struct {
@@ -74,6 +75,16 @@ func (tr *todoRepository) GetAllTodos(ctx context.Context, todos *[]entity.Todo)
 func (tr *todoRepository) UpdateTodoByTodoID(ctx context.Context, todo *entity.Todo) error {
 	query := `UPDATE todos SET text = $1 WHERE todo_id = $2 RETURNING todo_id, text, done, user_id`
 	err := tr.db.QueryRowContext(ctx, query, todo.Text, todo.TodoID).Scan(&todo.TodoID, &todo.Text, &todo.Done, &todo.User.UserID)
+	if err != nil {
+		return errors.WithStack(err)
+	}
+
+	return nil
+}
+
+func (tr *todoRepository) DeleteTodoByTodoID(ctx context.Context, todoID int) error {
+	query := `DELETE FROM todos WHERE todo_id = $1`
+	_, err := tr.db.ExecContext(ctx, query, todoID)
 	if err != nil {
 		return errors.WithStack(err)
 	}
