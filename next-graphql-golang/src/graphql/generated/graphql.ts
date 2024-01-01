@@ -20,11 +20,24 @@ export type Scalars = {
 export type Mutation = {
   __typename?: 'Mutation';
   createTodo: Todo;
+  deleteTodo: Scalars['Boolean']['output'];
+  updateTodo: Todo;
 };
 
 
 export type MutationCreateTodoArgs = {
   input: NewTodo;
+};
+
+
+export type MutationDeleteTodoArgs = {
+  todoId: Scalars['ID']['input'];
+};
+
+
+export type MutationUpdateTodoArgs = {
+  text: Scalars['String']['input'];
+  todoId: Scalars['ID']['input'];
 };
 
 export type NewTodo = {
@@ -59,6 +72,14 @@ export type CreateTodoMutationVariables = Exact<{
 
 export type CreateTodoMutation = { __typename?: 'Mutation', createTodo: { __typename?: 'Todo', text: string, done: boolean, user: { __typename?: 'User', id: string } } };
 
+export type UpdateTodoTextMutationVariables = Exact<{
+  id: Scalars['ID']['input'];
+  text: Scalars['String']['input'];
+}>;
+
+
+export type UpdateTodoTextMutation = { __typename?: 'Mutation', updateTodo: { __typename?: 'Todo', id: string, text: string } };
+
 export type GetTodoQueryVariables = Exact<{ [key: string]: never; }>;
 
 
@@ -73,6 +94,14 @@ export const CreateTodoDocument = gql`
     }
     text
     done
+  }
+}
+    `;
+export const UpdateTodoTextDocument = gql`
+    mutation UpdateTodoText($id: ID!, $text: String!) {
+  updateTodo(todoId: $id, text: $text) {
+    id
+    text
   }
 }
     `;
@@ -94,6 +123,9 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
   return {
     CreateTodo(variables: CreateTodoMutationVariables, requestHeaders?: GraphQLClientRequestHeaders): Promise<CreateTodoMutation> {
       return withWrapper((wrappedRequestHeaders) => client.request<CreateTodoMutation>(CreateTodoDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'CreateTodo', 'mutation', variables);
+    },
+    UpdateTodoText(variables: UpdateTodoTextMutationVariables, requestHeaders?: GraphQLClientRequestHeaders): Promise<UpdateTodoTextMutation> {
+      return withWrapper((wrappedRequestHeaders) => client.request<UpdateTodoTextMutation>(UpdateTodoTextDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'UpdateTodoText', 'mutation', variables);
     },
     getTodo(variables?: GetTodoQueryVariables, requestHeaders?: GraphQLClientRequestHeaders): Promise<GetTodoQuery> {
       return withWrapper((wrappedRequestHeaders) => client.request<GetTodoQuery>(GetTodoDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getTodo', 'query', variables);

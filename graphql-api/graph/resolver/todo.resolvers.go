@@ -14,8 +14,6 @@ import (
 
 // CreateTodo is the resolver for the createTodo field.
 func (r *mutationResolver) CreateTodo(ctx context.Context, input model.NewTodo) (*model.Todo, error) {
-	fmt.Println("CreateTodo")
-	fmt.Println(input)
 	userID, err := strconv.Atoi(input.UserID)
 	if err != nil {
 		return nil, err
@@ -45,6 +43,39 @@ func (r *mutationResolver) CreateTodo(ctx context.Context, input model.NewTodo) 
 	}
 
 	return resTodo, nil
+}
+
+// UpdateTodo is the resolver for the updateTodo field.
+func (r *mutationResolver) UpdateTodo(ctx context.Context, todoID string, text string) (*model.Todo, error) {
+	tID, err := strconv.Atoi(todoID)
+	if err != nil {
+		return nil, err
+	}
+	todo := &entity.Todo{
+		TodoID: tID,
+		Text:   text,
+	}
+
+	err = r.tu.UpdateTodo(ctx, todo)
+	if err != nil {
+		return nil, err
+	}
+
+	resTodo := &model.Todo{
+		ID:   strconv.Itoa(todo.TodoID),
+		Text: todo.Text,
+		Done: todo.Done,
+		User: &model.User{
+			ID:   strconv.Itoa(todo.User.UserID),
+			Name: todo.User.Name,
+		},
+	}
+	return resTodo, nil
+}
+
+// DeleteTodo is the resolver for the deleteTodo field.
+func (r *mutationResolver) DeleteTodo(ctx context.Context, todoID string) (bool, error) {
+	panic(fmt.Errorf("not implemented: DeleteTodo - deleteTodo"))
 }
 
 // Todos is the resolver for the todos field.

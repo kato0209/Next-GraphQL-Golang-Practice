@@ -21,3 +21,11 @@ input NewTodo {
 extend type Mutation {
   createTodo(input: NewTodo!): Todo!
 }
+
+extend type Mutation {
+  updateTodo(todoId: ID!, text: String!): Todo!
+}
+
+extend type Mutation {
+  deleteTodo(todoId: ID!): Boolean!
+}

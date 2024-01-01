@@ -1,15 +1,23 @@
 import type { NextPage } from "next";
 import * as React from 'react';
 import { useQuery, useMutation  } from "@apollo/client";
-import { CreateTodoMutation, GetTodoDocument, GetTodoQuery, CreateTodoDocument } from "../graphql/generated/graphql";
+import { CreateTodoMutation, GetTodoDocument, GetTodoQuery, CreateTodoDocument, UpdateTodoTextDocument, UpdateTodoTextMutation } from "../graphql/generated/graphql";
 import { Box } from "@mui/material";
 import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
+import EditIcon from '@mui/icons-material/Edit';
+import IconButton from '@mui/material/IconButton';
+import { Menu, MenuItem } from '@mui/material';
 
 const Home: NextPage = () => {
   const { data, refetch  } = useQuery<GetTodoQuery>(GetTodoDocument);
   const [input, setInput] = React.useState<string>('');
   const [createTodo, { loading, error }] = useMutation<CreateTodoMutation>(CreateTodoDocument);
+  const [todoAnchorEl, setTodoAnchorEl] = React.useState<null | HTMLElement>(null);
+  const [updateInput, setUpdateInput] = React.useState<string>('');
+  const [updateTodo, { loading: updateLoading, error: updateError }] = useMutation<UpdateTodoTextMutation>(UpdateTodoTextDocument);
+  const [selectedUpdateTodoID, setSelectedUpdateTodoID] = React.useState<string>("");
+  
 
   const handleCreateTodo = async () => {
     await createTodo({
@@ -21,8 +29,30 @@ const Home: NextPage = () => {
     await refetch();
   }
 
-  if (loading) return 'Submitting...';
-  if (error) return `Submission error! ${error.message}`;
+  const handleUpdateDialogOpen  = (event: React.MouseEvent<HTMLElement>, todoID: string) => {
+    setTodoAnchorEl(event.currentTarget);
+    setSelectedUpdateTodoID(todoID);
+  };
+
+  const handleUpdateDialogClose = () => {
+    setTodoAnchorEl(null);
+    setSelectedUpdateTodoID("");
+  };
+
+
+  const handleUpdateTodo = async () => {
+    await updateTodo({
+      variables: {
+        text: updateInput,
+        id: selectedUpdateTodoID,
+      },
+    });
+  }
+
+  if (loading) return 'Creating todo...';
+  if (error) return `Creation error! ${error.message}`;
+  if (updateLoading) return 'Updating todo...';
+  if (updateError) return `Updating error! ${updateError.message}`;
 
   return (
     <Box component="main" sx={{display: "flex",flexDirection: "column", textAlign: "center"}}>
@@ -69,9 +99,65 @@ const Home: NextPage = () => {
     </>
       <>
         {data?.todos?.map((todo) => (
-          <div key={todo.id}>
-            <h1>{todo.text}</h1>
-          </div>
+          <Box 
+            key={todo.id}
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+          >
+            <h3>{todo.text},{todo.id}</h3>
+            <IconButton onClick={(e) => handleUpdateDialogOpen(e, todo.id)}>
+              <EditIcon />
+            </IconButton>
+            <Menu 
+              anchorEl={todoAnchorEl}
+              open={Boolean(todoAnchorEl)} 
+              onClose={handleUpdateDialogClose}
+              sx={{
+                
+                '& .MuiPaper-root': {
+                    
+                    boxShadow: 'none', 
+                    border: '1px solid #ccc',
+                },
+                '& .MuiList-root ': {
+                  display: 'flex',
+                  padding: '1rem',
+              }
+            }}
+            >
+                <TextField
+                  id="todo-update-input"
+                  label="タスクを更新"
+                  sx = {{width: '100%', alignItems: 'center'}}
+                  value={updateInput}
+                  onChange={(e) => setUpdateInput(e.target.value)}
+                />
+                <Button 
+                  onClick={(e) => {
+                    e.preventDefault();
+                    handleUpdateTodo();
+                    setUpdateInput('');
+                    handleUpdateDialogClose();
+                  }}
+                  sx={{
+                    color: '#fff',
+                    backgroundColor: '#FF7E73',
+                    '&:hover': {
+                    backgroundColor: '#E56A67',
+                    },
+                    '&.Mui-disabled': {
+                        backgroundColor: '#FFA49D',
+                        color: '#fff',
+                    }
+                  }}
+                >
+                  更新
+                </Button>
+            </Menu>
+          </Box>
         ))}
       </>
     </Box>

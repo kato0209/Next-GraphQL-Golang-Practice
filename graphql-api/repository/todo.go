@@ -11,6 +11,7 @@ import (
 type ITodoRepository interface {
 	CreateTodo(ctx context.Context, todo *entity.Todo) error
 	GetAllTodos(ctx context.Context, todos *[]entity.Todo) error
+	UpdateTodoByTodoID(ctx context.Context, todo *entity.Todo) error
 }
 
 type todoRepository struct {
@@ -41,7 +42,8 @@ func (tr *todoRepository) GetAllTodos(ctx context.Context, todos *[]entity.Todo)
 			FROM 
 				todos
 			INNER JOIN 
-				users ON todos.user_id = users.user_id;`
+				users ON todos.user_id = users.user_id
+			ORDER BY todos.created_at;`
 	rows, err := tr.db.QueryContext(ctx, query)
 	if err != nil {
 		return errors.WithStack(err)
@@ -63,6 +65,16 @@ func (tr *todoRepository) GetAllTodos(ctx context.Context, todos *[]entity.Todo)
 		*todos = append(*todos, todo)
 	}
 	if err := rows.Err(); err != nil {
+		return errors.WithStack(err)
+	}
+
+	return nil
+}
+
+func (tr *todoRepository) UpdateTodoByTodoID(ctx context.Context, todo *entity.Todo) error {
+	query := `UPDATE todos SET text = $1 WHERE todo_id = $2 RETURNING todo_id, text, done, user_id`
+	err := tr.db.QueryRowContext(ctx, query, todo.Text, todo.TodoID).Scan(&todo.TodoID, &todo.Text, &todo.Done, &todo.User.UserID)
+	if err != nil {
 		return errors.WithStack(err)
 	}
 
