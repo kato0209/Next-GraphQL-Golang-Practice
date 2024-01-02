@@ -4,6 +4,7 @@ import (
 	"graphql-api/db"
 	"graphql-api/graph/generated"
 	"graphql-api/graph/resolver"
+	"graphql-api/middleware"
 	"graphql-api/repository"
 	"graphql-api/usecase"
 	"log"
@@ -36,14 +37,20 @@ func main() {
 	iTodoUsecase := usecase.NewTodoUsecase(iTodoRepository, iUserRepository)
 	iUserUsecase := usecase.NewUserUsecase(iUserRepository)
 	resolver := resolver.NewResolver(iTodoUsecase, iUserUsecase)
-	srv := handler.NewDefaultServer(generated.NewExecutableSchema(generated.Config{Resolvers: resolver}))
+
+	directive := generated.DirectiveRoot{IsAuthenticated: middleware.Authorize}
+	srv := handler.NewDefaultServer(generated.NewExecutableSchema(generated.Config{
+		Resolvers:  resolver,
+		Directives: directive,
+	},
+	))
 
 	c := cors.New(cors.Options{
 		AllowedOrigins:   []string{"http://localhost:3000"},
 		AllowCredentials: true,
 	})
 	http.Handle("/", playground.Handler("GraphQL playground", "/query"))
-	http.Handle("/query", c.Handler(srv))
+	http.Handle("/query", c.Handler(middleware.CookieMiddleWare(srv)))
 
 	log.Printf("connect to http://localhost:%s/ for GraphQL playground", port)
 	log.Fatal(http.ListenAndServe(":"+port, nil))

@@ -8,7 +8,7 @@ import (
 	"context"
 	"graphql-api/entity"
 	"graphql-api/graph/model"
-	"net/http"
+	"graphql-api/middleware"
 	"strconv"
 )
 
@@ -49,17 +49,7 @@ func (r *mutationResolver) Login(ctx context.Context, input model.LoginUser) (*m
 		Name: loginUser.Name,
 	}
 
-	rw, ok := ctx.Value("responseWriter").(http.ResponseWriter)
-	if !ok {
-		return nil, err
-	}
-
-	http.SetCookie(rw, &http.Cookie{
-		Name:     "jwt_token",
-		Value:    tokenString,
-		Path:     "/",
-		HttpOnly: true,
-	})
+	middleware.SetAuthCookie(ctx, tokenString)
 
 	return resUser, nil
 }

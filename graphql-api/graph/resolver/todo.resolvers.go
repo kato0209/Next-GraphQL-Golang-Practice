@@ -6,6 +6,7 @@ package resolver
 
 import (
 	"context"
+	"fmt"
 	"graphql-api/entity"
 	"graphql-api/graph/model"
 	"strconv"
@@ -89,6 +90,11 @@ func (r *mutationResolver) DeleteTodo(ctx context.Context, todoID string) (bool,
 
 // Todos is the resolver for the todos field.
 func (r *queryResolver) Todos(ctx context.Context) ([]*model.Todo, error) {
+	userID, err := strconv.Atoi(ctx.Value("user_id").(string))
+	if err != nil {
+		return nil, err
+	}
+	fmt.Println(userID)
 	todos, err := r.tu.GetAllTodos(ctx)
 	if err != nil {
 		return nil, err

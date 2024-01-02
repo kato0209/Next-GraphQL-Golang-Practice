@@ -7,7 +7,7 @@ import (
 	"os"
 	"time"
 
-	"github.com/golang-jwt/jwt"
+	"github.com/golang-jwt/jwt/v4"
 	"github.com/pkg/errors"
 	"golang.org/x/crypto/bcrypt"
 )
@@ -74,6 +74,8 @@ func (uu *userUsecase) Login(ctx context.Context, user *entity.User) (string, er
 	if err != nil {
 		return "", errors.WithStack(err)
 	}
+	user.UserID = storedUser.UserID
+	user.Name = storedUser.Name
 
 	tokenString, err := createJwtTokenByUserID(user.UserID)
 	if err != nil {

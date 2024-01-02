@@ -10,7 +10,7 @@ type Todo {
 }
 
 extend type Query {
-  todos: [Todo!]!
+  todos: [Todo!]! @isAuthenticated
 }
 
 input NewTodo {
