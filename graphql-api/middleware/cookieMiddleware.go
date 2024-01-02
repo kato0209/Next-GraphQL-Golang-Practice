@@ -16,6 +16,7 @@ var jwtTokenKey = &contextKey{"jwtToken"}
 // CookieMiddleWare
 func CookieMiddleWare(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		fmt.Println(7877777777777)
 		ctx := context.WithValue(r.Context(), httpWriterKey, w)
 		cookie, err := r.Cookie("jwt_token")
 		fmt.Println(cookie)
