@@ -69,6 +69,7 @@ export type NewUser = {
 
 export type Query = {
   __typename?: 'Query';
+  loggedIn: Scalars['Boolean']['output'];
   todos: Array<Todo>;
 };
 
@@ -125,6 +126,11 @@ export type UpdateTodoTextMutationVariables = Exact<{
 
 export type UpdateTodoTextMutation = { __typename?: 'Mutation', updateTodo: { __typename?: 'Todo', id: string, text: string } };
 
+export type IsLoggedInQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type IsLoggedInQuery = { __typename?: 'Query', loggedIn: boolean };
+
 export type GetTodoQueryVariables = Exact<{ [key: string]: never; }>;
 
 
@@ -171,6 +177,11 @@ export const UpdateTodoTextDocument = gql`
   }
 }
     `;
+export const IsLoggedInDocument = gql`
+    query IsLoggedIn {
+  loggedIn
+}
+    `;
 export const GetTodoDocument = gql`
     query getTodo {
   todos {
@@ -201,6 +212,9 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     },
     UpdateTodoText(variables: UpdateTodoTextMutationVariables, requestHeaders?: GraphQLClientRequestHeaders): Promise<UpdateTodoTextMutation> {
       return withWrapper((wrappedRequestHeaders) => client.request<UpdateTodoTextMutation>(UpdateTodoTextDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'UpdateTodoText', 'mutation', variables);
+    },
+    IsLoggedIn(variables?: IsLoggedInQueryVariables, requestHeaders?: GraphQLClientRequestHeaders): Promise<IsLoggedInQuery> {
+      return withWrapper((wrappedRequestHeaders) => client.request<IsLoggedInQuery>(IsLoggedInDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'IsLoggedIn', 'query', variables);
     },
     getTodo(variables?: GetTodoQueryVariables, requestHeaders?: GraphQLClientRequestHeaders): Promise<GetTodoQuery> {
       return withWrapper((wrappedRequestHeaders) => client.request<GetTodoQuery>(GetTodoDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'getTodo', 'query', variables);

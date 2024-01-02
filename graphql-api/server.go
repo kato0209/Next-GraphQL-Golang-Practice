@@ -14,7 +14,6 @@ import (
 	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/99designs/gqlgen/graphql/playground"
 	_ "github.com/lib/pq"
-	"github.com/rs/cors"
 	"golang.org/x/exp/slog"
 )
 
@@ -38,19 +37,21 @@ func main() {
 	iUserUsecase := usecase.NewUserUsecase(iUserRepository)
 	resolver := resolver.NewResolver(iTodoUsecase, iUserUsecase)
 
-	directive := generated.DirectiveRoot{IsAuthenticated: middleware.Authorize}
+	directive := generated.DirectiveRoot{IsAuthenticated: middleware.AuthorizeMiddleware}
 	srv := handler.NewDefaultServer(generated.NewExecutableSchema(generated.Config{
 		Resolvers:  resolver,
 		Directives: directive,
 	},
 	))
 
-	c := cors.New(cors.Options{
-		AllowedOrigins:   []string{"http://localhost:3000"},
-		AllowCredentials: true,
-	})
+	/*
+		c := cors.New(cors.Options{
+			AllowedOrigins:   []string{"http://localhost:3000"},
+			AllowCredentials: true,
+		})
+	*/
 	http.Handle("/", playground.Handler("GraphQL playground", "/query"))
-	http.Handle("/query", c.Handler(middleware.CookieMiddleWare(srv)))
+	http.Handle("/query", middleware.CookieMiddleWare(srv))
 
 	log.Printf("connect to http://localhost:%s/ for GraphQL playground", port)
 	log.Fatal(http.ListenAndServe(":"+port, nil))

@@ -2,6 +2,7 @@ package middleware
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 )
 
@@ -17,6 +18,7 @@ func CookieMiddleWare(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		ctx := context.WithValue(r.Context(), httpWriterKey, w)
 		cookie, err := r.Cookie("jwt_token")
+		fmt.Println(cookie)
 		if err == nil {
 			ctx = context.WithValue(ctx, jwtTokenKey, cookie.Value)
 		}
@@ -43,7 +45,9 @@ func SetAuthCookie(ctx context.Context, sessionToken string) {
 	http.SetCookie(writer, &http.Cookie{
 		HttpOnly: true,
 		MaxAge:   day,
+		SameSite: http.SameSiteNoneMode,
 		Name:     "jwt_token",
+		Secure:   true,
 		Value:    sessionToken,
 	})
 }

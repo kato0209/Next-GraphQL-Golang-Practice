@@ -8,11 +8,13 @@ import Container from '@mui/material/Container';
 import Button from '@mui/material/Button';
 import { useMutation  } from "@apollo/client";
 import { LoginMutation, LoginDocument } from "../graphql/generated/graphql";
+import { useRouter } from 'next/router';
 
 export default function Login() {
     const [email, setEmail] = React.useState<string>('');
     const [password, setPassword] = React.useState<string>('');
     const [login, { loading: loginLoading, error: loginError }] = useMutation<LoginMutation>(LoginDocument);
+    const router = useRouter();
 
     const handleLogin = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
@@ -22,6 +24,7 @@ export default function Login() {
                 password: password,
             },
         });
+        router.push('/');
     }
 
     if (loginLoading) return 'Login...';

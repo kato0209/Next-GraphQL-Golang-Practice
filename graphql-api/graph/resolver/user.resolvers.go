@@ -61,3 +61,12 @@ func (r *mutationResolver) Login(ctx context.Context, input model.LoginUser) (*m
 
 	return resUser, nil
 }
+
+// LoggedIn is the resolver for the loggedIn field.
+func (r *queryResolver) LoggedIn(ctx context.Context) (bool, error) {
+	err := middleware.Authorize(ctx)
+	if err != nil {
+		return false, nil
+	}
+	return true, nil
+}

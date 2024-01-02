@@ -8,6 +8,7 @@ import Container from '@mui/material/Container';
 import Button from '@mui/material/Button';
 import { useMutation  } from "@apollo/client";
 import { CreateUserDocument, CreateUserMutation } from "../graphql/generated/graphql";
+import { useRouter } from 'next/router';
 
 export default function SignUp() {
     const [email, setEmail] = React.useState<string>('');
@@ -15,6 +16,7 @@ export default function SignUp() {
     const [password, setPassword] = React.useState<string>('');
     const [confirmationPassword, setConfirmationPassword] = React.useState<string>('');
     const [createUser, { loading: createLoading, error: createError }] = useMutation<CreateUserMutation>(CreateUserDocument);
+    const router = useRouter();
 
     const handleCreateUser = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
@@ -29,6 +31,7 @@ export default function SignUp() {
                 password: password,
             },
         });
+        router.push('/');
     }
 
     if (createLoading) return 'Creating todo...';

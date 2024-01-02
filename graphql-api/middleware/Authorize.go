@@ -30,7 +30,22 @@ func decodeJWT(tokenString string) (*jwt.MapClaims, error) {
 	}
 }
 
-func Authorize(ctx context.Context, obj interface{}, next graphql.Resolver) (interface{}, error) {
+func Authorize(ctx context.Context) error {
+	jwtToken, ok := ctx.Value(jwtTokenKey).(string)
+	if !ok {
+		return errors.New(fmt.Sprintf("failed to authorize"))
+	}
+
+	_, err := decodeJWT(jwtToken)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// Authorize is a middleware that checks if the user is authorized
+func AuthorizeMiddleware(ctx context.Context, obj interface{}, next graphql.Resolver) (interface{}, error) {
 	jwtToken, ok := ctx.Value(jwtTokenKey).(string)
 	if !ok {
 		return nil, errors.New(fmt.Sprintf("failed to authorize"))
