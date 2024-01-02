@@ -17,10 +17,17 @@ export type Scalars = {
   Float: { input: number; output: number; }
 };
 
+export type LoginUser = {
+  email: Scalars['String']['input'];
+  password: Scalars['String']['input'];
+};
+
 export type Mutation = {
   __typename?: 'Mutation';
   createTodo: Todo;
+  createUser: User;
   deleteTodo: Scalars['Boolean']['output'];
+  login: User;
   updateTodo: Todo;
 };
 
@@ -30,8 +37,18 @@ export type MutationCreateTodoArgs = {
 };
 
 
+export type MutationCreateUserArgs = {
+  input: NewUser;
+};
+
+
 export type MutationDeleteTodoArgs = {
   todoId: Scalars['ID']['input'];
+};
+
+
+export type MutationLoginArgs = {
+  input: LoginUser;
 };
 
 
@@ -42,7 +59,12 @@ export type MutationUpdateTodoArgs = {
 
 export type NewTodo = {
   text: Scalars['String']['input'];
-  userId: Scalars['ID']['input'];
+};
+
+export type NewUser = {
+  email: Scalars['String']['input'];
+  name: Scalars['String']['input'];
+  password: Scalars['String']['input'];
 };
 
 export type Query = {
@@ -66,7 +88,6 @@ export type User = {
 
 export type CreateTodoMutationVariables = Exact<{
   text: Scalars['String']['input'];
-  userId: Scalars['ID']['input'];
 }>;
 
 
@@ -94,8 +115,8 @@ export type GetTodoQuery = { __typename?: 'Query', todos: Array<{ __typename?: '
 
 
 export const CreateTodoDocument = gql`
-    mutation CreateTodo($text: String!, $userId: ID!) {
-  createTodo(input: {text: $text, userId: $userId}) {
+    mutation CreateTodo($text: String!) {
+  createTodo(input: {text: $text}) {
     user {
       id
     }

@@ -10,7 +10,7 @@ import (
 
 type ITodoRepository interface {
 	CreateTodo(ctx context.Context, todo *entity.Todo) error
-	GetAllTodos(ctx context.Context, todos *[]entity.Todo) error
+	GetAllTodos(ctx context.Context, todos *[]entity.Todo, userID int) error
 	UpdateTodoByTodoID(ctx context.Context, todo *entity.Todo) error
 	DeleteTodoByTodoID(ctx context.Context, todoID int) error
 }
@@ -33,7 +33,7 @@ func (tr *todoRepository) CreateTodo(ctx context.Context, todo *entity.Todo) err
 	return nil
 }
 
-func (tr *todoRepository) GetAllTodos(ctx context.Context, todos *[]entity.Todo) error {
+func (tr *todoRepository) GetAllTodos(ctx context.Context, todos *[]entity.Todo, userID int) error {
 	query := `SELECT 
 				todos.todo_id,
 				todos.text,
@@ -44,8 +44,9 @@ func (tr *todoRepository) GetAllTodos(ctx context.Context, todos *[]entity.Todo)
 				todos
 			INNER JOIN 
 				users ON todos.user_id = users.user_id
+			WHERE users.user_id = $1 
 			ORDER BY todos.created_at;`
-	rows, err := tr.db.QueryContext(ctx, query)
+	rows, err := tr.db.QueryContext(ctx, query, userID)
 	if err != nil {
 		return errors.WithStack(err)
 	}

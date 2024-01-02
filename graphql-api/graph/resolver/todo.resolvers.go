@@ -6,7 +6,6 @@ package resolver
 
 import (
 	"context"
-	"fmt"
 	"graphql-api/entity"
 	"graphql-api/graph/model"
 	"strconv"
@@ -14,7 +13,7 @@ import (
 
 // CreateTodo is the resolver for the createTodo field.
 func (r *mutationResolver) CreateTodo(ctx context.Context, input model.NewTodo) (*model.Todo, error) {
-	userID, err := strconv.Atoi(input.UserID)
+	userID, err := strconv.Atoi(ctx.Value("user_id").(string))
 	if err != nil {
 		return nil, err
 	}
@@ -94,8 +93,8 @@ func (r *queryResolver) Todos(ctx context.Context) ([]*model.Todo, error) {
 	if err != nil {
 		return nil, err
 	}
-	fmt.Println(userID)
-	todos, err := r.tu.GetAllTodos(ctx)
+
+	todos, err := r.tu.GetAllTodos(ctx, userID)
 	if err != nil {
 		return nil, err
 	}

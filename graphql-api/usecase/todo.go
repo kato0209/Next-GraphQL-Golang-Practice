@@ -10,7 +10,7 @@ import (
 
 type ITodoUsecase interface {
 	CreateTodo(ctx context.Context, todo *entity.Todo) error
-	GetAllTodos(ctx context.Context) ([]entity.Todo, error)
+	GetAllTodos(ctx context.Context, userID int) ([]entity.Todo, error)
 	UpdateTodo(ctx context.Context, todo *entity.Todo) error
 	DeleteTodo(ctx context.Context, todoID int) error
 }
@@ -40,10 +40,10 @@ func (tu *todoUsecase) CreateTodo(ctx context.Context, todo *entity.Todo) error 
 	return nil
 }
 
-func (tu *todoUsecase) GetAllTodos(ctx context.Context) ([]entity.Todo, error) {
+func (tu *todoUsecase) GetAllTodos(ctx context.Context, userID int) ([]entity.Todo, error) {
 
 	todos := []entity.Todo{}
-	err := tu.tr.GetAllTodos(ctx, &todos)
+	err := tu.tr.GetAllTodos(ctx, &todos, userID)
 	if err != nil {
 		return nil, errors.WithStack(err)
 	}

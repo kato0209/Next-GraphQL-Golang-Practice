@@ -25,7 +25,6 @@ const Home: NextPage = () => {
     await createTodo({
       variables: {
         text: input,
-        userId: "1",
       },
     });
     await refetch();

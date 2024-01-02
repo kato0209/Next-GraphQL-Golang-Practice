@@ -15,17 +15,16 @@ extend type Query {
 
 input NewTodo {
   text: String!
-  userId: ID!
 }
 
 extend type Mutation {
-  createTodo(input: NewTodo!): Todo!
+  createTodo(input: NewTodo!): Todo! @isAuthenticated
 }
 
 extend type Mutation {
-  updateTodo(todoId: ID!, text: String!): Todo!
+  updateTodo(todoId: ID!, text: String!): Todo! @isAuthenticated
 }
 
 extend type Mutation {
-  deleteTodo(todoId: ID!): Boolean!
+  deleteTodo(todoId: ID!): Boolean! @isAuthenticated
 }
