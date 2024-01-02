@@ -6,6 +6,7 @@ package resolver
 
 import (
 	"context"
+	"fmt"
 	"graphql-api/entity"
 	"graphql-api/graph/model"
 	"strconv"
@@ -13,6 +14,7 @@ import (
 
 // CreateTodo is the resolver for the createTodo field.
 func (r *mutationResolver) CreateTodo(ctx context.Context, input model.NewTodo) (*model.Todo, error) {
+	fmt.Println(9999999999)
 	userID, err := strconv.Atoi(ctx.Value("user_id").(string))
 	if err != nil {
 		return nil, err

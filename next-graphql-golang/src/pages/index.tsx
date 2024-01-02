@@ -1,7 +1,7 @@
 import type { NextPage } from "next";
 import * as React from 'react';
 import { useQuery, useMutation  } from "@apollo/client";
-import { CreateTodoMutation, GetTodoDocument, GetTodoQuery, CreateTodoDocument, UpdateTodoTextDocument, UpdateTodoTextMutation, DeleteTodoDocument, DeleteTodoMutation, IsLoggedInDocument, IsLoggedInQuery } from "../graphql/generated/graphql";
+import { CreateTodoMutation, GetTodoDocument, GetTodoQuery, CreateTodoDocument, UpdateTodoTextDocument, UpdateTodoTextMutation, DeleteTodoDocument, DeleteTodoMutation, IsLoggedInDocument, IsLoggedInQuery, Todo } from "../graphql/generated/graphql";
 import { Box } from "@mui/material";
 import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
@@ -13,8 +13,12 @@ import { GetServerSideProps } from "next";
 import { ApolloClient, InMemoryCache, createHttpLink } from "@apollo/client";
 import { ApolloLink, Operation, NextLink } from '@apollo/client';
 
-const Home: NextPage = () => {
-  const { data, refetch  } = useQuery<GetTodoQuery>(GetTodoDocument);
+type Props = {
+  todos: Todo[];
+}
+
+const Home: React.FC<Props> = ({todos: initialTodos}) => {
+  const [todos, setTodos] = React.useState(initialTodos);
   const [input, setInput] = React.useState<string>('');
   const [updateTodoAnchorEl, setUpdateTodoAnchorEl] = React.useState<null | HTMLElement>(null);
   const [updateInput, setUpdateInput] = React.useState<string>('');
@@ -24,13 +28,17 @@ const Home: NextPage = () => {
   const [updateTodo, { loading: updateLoading, error: updateError }] = useMutation<UpdateTodoTextMutation>(UpdateTodoTextDocument);
   const [deleteTodo, { loading: deleteLoading, error: deleteError }] = useMutation<DeleteTodoMutation>(DeleteTodoDocument);
 
+  React.useEffect(() => {
+    setTodos(initialTodos);
+  }, [initialTodos]);
+
   const handleCreateTodo = async () => {
     await createTodo({
       variables: {
         text: input,
       },
     });
-    await refetch();
+    //await refetch();
   }
 
   const handleUpdateDialogOpen  = (event: React.MouseEvent<HTMLElement>, todoID: string) => {
@@ -59,7 +67,7 @@ const Home: NextPage = () => {
         todoId: todoID,
       },
     });
-    await refetch();
+    //await refetch();
   }
 
   if (createLoading) return 'Creating todo...';
@@ -113,7 +121,7 @@ const Home: NextPage = () => {
         </Box>
     </>
       <>
-        {data?.todos?.map((todo) => (
+        {todos?.map((todo) => (
           <Box 
             key={todo.id}
             sx={{
@@ -222,7 +230,6 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   const { data } = await client.query<GetTodoQuery>({
     query: GetTodoDocument,
   });
-  console.log(data);
 
   return {
     props: {todos: data?.todos},
