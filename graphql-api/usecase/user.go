@@ -74,6 +74,7 @@ func (uu *userUsecase) Login(ctx context.Context, user *entity.User) (string, er
 	if err != nil {
 		return "", errors.WithStack(err)
 	}
+
 	user.UserID = storedUser.UserID
 	user.Name = storedUser.Name
 

@@ -93,12 +93,29 @@ export type CreateTodoMutationVariables = Exact<{
 
 export type CreateTodoMutation = { __typename?: 'Mutation', createTodo: { __typename?: 'Todo', text: string, done: boolean, user: { __typename?: 'User', id: string } } };
 
+export type CreateUserMutationVariables = Exact<{
+  name: Scalars['String']['input'];
+  email: Scalars['String']['input'];
+  password: Scalars['String']['input'];
+}>;
+
+
+export type CreateUserMutation = { __typename?: 'Mutation', createUser: { __typename?: 'User', id: string, name: string } };
+
 export type DeleteTodoMutationVariables = Exact<{
   todoId: Scalars['ID']['input'];
 }>;
 
 
 export type DeleteTodoMutation = { __typename?: 'Mutation', deleteTodo: boolean };
+
+export type LoginMutationVariables = Exact<{
+  email: Scalars['String']['input'];
+  password: Scalars['String']['input'];
+}>;
+
+
+export type LoginMutation = { __typename?: 'Mutation', login: { __typename?: 'User', id: string, name: string } };
 
 export type UpdateTodoTextMutationVariables = Exact<{
   id: Scalars['ID']['input'];
@@ -125,9 +142,25 @@ export const CreateTodoDocument = gql`
   }
 }
     `;
+export const CreateUserDocument = gql`
+    mutation CreateUser($name: String!, $email: String!, $password: String!) {
+  createUser(input: {name: $name, email: $email, password: $password}) {
+    id
+    name
+  }
+}
+    `;
 export const DeleteTodoDocument = gql`
     mutation DeleteTodo($todoId: ID!) {
   deleteTodo(todoId: $todoId)
+}
+    `;
+export const LoginDocument = gql`
+    mutation Login($email: String!, $password: String!) {
+  login(input: {email: $email, password: $password}) {
+    id
+    name
+  }
 }
     `;
 export const UpdateTodoTextDocument = gql`
@@ -157,8 +190,14 @@ export function getSdk(client: GraphQLClient, withWrapper: SdkFunctionWrapper = 
     CreateTodo(variables: CreateTodoMutationVariables, requestHeaders?: GraphQLClientRequestHeaders): Promise<CreateTodoMutation> {
       return withWrapper((wrappedRequestHeaders) => client.request<CreateTodoMutation>(CreateTodoDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'CreateTodo', 'mutation', variables);
     },
+    CreateUser(variables: CreateUserMutationVariables, requestHeaders?: GraphQLClientRequestHeaders): Promise<CreateUserMutation> {
+      return withWrapper((wrappedRequestHeaders) => client.request<CreateUserMutation>(CreateUserDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'CreateUser', 'mutation', variables);
+    },
     DeleteTodo(variables: DeleteTodoMutationVariables, requestHeaders?: GraphQLClientRequestHeaders): Promise<DeleteTodoMutation> {
       return withWrapper((wrappedRequestHeaders) => client.request<DeleteTodoMutation>(DeleteTodoDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'DeleteTodo', 'mutation', variables);
+    },
+    Login(variables: LoginMutationVariables, requestHeaders?: GraphQLClientRequestHeaders): Promise<LoginMutation> {
+      return withWrapper((wrappedRequestHeaders) => client.request<LoginMutation>(LoginDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'Login', 'mutation', variables);
     },
     UpdateTodoText(variables: UpdateTodoTextMutationVariables, requestHeaders?: GraphQLClientRequestHeaders): Promise<UpdateTodoTextMutation> {
       return withWrapper((wrappedRequestHeaders) => client.request<UpdateTodoTextMutation>(UpdateTodoTextDocument, variables, {...requestHeaders, ...wrappedRequestHeaders}), 'UpdateTodoText', 'mutation', variables);

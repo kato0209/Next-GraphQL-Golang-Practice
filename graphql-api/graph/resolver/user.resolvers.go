@@ -25,10 +25,18 @@ func (r *mutationResolver) CreateUser(ctx context.Context, input model.NewUser) 
 		return nil, err
 	}
 
+	newUser.Password = input.Password
+	tokenString, err := r.uu.Login(ctx, newUser)
+	if err != nil {
+		return nil, err
+	}
+
 	resUser := &model.User{
 		ID:   strconv.Itoa(newUser.UserID),
 		Name: newUser.Name,
 	}
+
+	middleware.SetAuthCookie(ctx, tokenString)
 
 	return resUser, nil
 }
