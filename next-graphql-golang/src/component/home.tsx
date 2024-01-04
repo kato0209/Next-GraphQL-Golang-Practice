@@ -12,13 +12,14 @@ import IconButton from '@mui/material/IconButton';
 import { Menu, MenuItem } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 
-
+/*
 type Props = {
   todos: Todo[];
 }
+*/
 
-const Home: React.FC<Props> = ({todos: initialTodos}) => {
-  const [todos, setTodos] = React.useState(initialTodos);
+const Home: NextPage = () => {
+  const { data, loading, error, refetch } = useQuery<GetTodoQuery>(GetTodoDocument);
   const [input, setInput] = React.useState<string>('');
   const [updateTodoAnchorEl, setUpdateTodoAnchorEl] = React.useState<null | HTMLElement>(null);
   const [updateInput, setUpdateInput] = React.useState<string>('');
@@ -28,28 +29,19 @@ const Home: React.FC<Props> = ({todos: initialTodos}) => {
   const [updateTodo, { loading: updateLoading, error: updateError }] = useMutation<UpdateTodoTextMutation>(UpdateTodoTextDocument);
   const [deleteTodo, { loading: deleteLoading, error: deleteError }] = useMutation<DeleteTodoMutation>(DeleteTodoDocument);
 
+  /*
   React.useEffect(() => {
     setTodos(initialTodos);
   }, [initialTodos]);
+  */
 
   const handleCreateTodo = async () => {
     await createTodo({
       variables: {
         text: input,
       },
-      update(cache, { data}) {
-        console.log(data?.createTodo)
-        if (data?.createTodo) {
-          const existingTodos = cache.readQuery<GetTodoQuery>({
-            query: GetTodoDocument,
-          });
-          console.log(existingTodos)
-          const newTodos = existingTodos ? [...existingTodos.todos, createTodo] : [createTodo];
-          cache.writeQuery({ query: GetTodoDocument, data: { todos: newTodos } });
-        }
-      }
     });
-    //await refetch();
+    await refetch();
   }
 
   const handleUpdateDialogOpen  = (event: React.MouseEvent<HTMLElement>, todoID: string) => {
@@ -78,9 +70,11 @@ const Home: React.FC<Props> = ({todos: initialTodos}) => {
         todoId: todoID,
       },
     });
-    //await refetch();
+    await refetch();
   }
 
+  if (loading) return 'Loading...';
+  if (error) return `Error! ${error.message}`;
   if (createLoading) return 'Creating todo...';
   if (createError) return `Creation error! ${createError.message}`;
   if (updateLoading) return 'Updating todo...';
@@ -132,7 +126,7 @@ const Home: React.FC<Props> = ({todos: initialTodos}) => {
         </Box>
     </>
       <>
-        {todos?.map((todo) => (
+        {data?.todos?.map((todo) => (
           <Box 
             key={todo.id}
             sx={{

@@ -14,14 +14,16 @@ import { ApolloClient, InMemoryCache, createHttpLink } from "@apollo/client";
 import { ApolloLink, Operation, NextLink } from '@apollo/client';
 import Home from "../component/home";
 
+/*
 type Props = {
   todos: Todo[];
 }
+*/
 
-const Index: React.FC<Props> = ({todos: initialTodos}) => {
+const Index: NextPage = () => {
   return (
     <>
-      <Home todos={initialTodos} />
+      <Home />
     </>
     
   )
@@ -40,7 +42,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       },
     };
   }
-
+/*
   const httpLink = createHttpLink({
     uri: "http://172.22.0.4:8080/query",
     credentials: "include",
@@ -71,5 +73,9 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 
   return {
     props: {todos: data?.todos},
+  };
+  */
+  return {
+    props: {},
   };
 };
