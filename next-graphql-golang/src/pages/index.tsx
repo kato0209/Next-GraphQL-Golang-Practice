@@ -42,9 +42,9 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       },
     };
   }
-/*
+
   const httpLink = createHttpLink({
-    uri: "http://172.22.0.4:8080/query",
+    uri: "http://backend:8080/query",
     credentials: "include",
   });
 
@@ -74,7 +74,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   return {
     props: {todos: data?.todos},
   };
-  */
+  
   return {
     props: {},
   };
