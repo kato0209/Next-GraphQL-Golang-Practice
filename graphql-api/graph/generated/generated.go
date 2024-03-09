@@ -44,6 +44,7 @@ type ResolverRoot interface {
 
 type DirectiveRoot struct {
 	IsAuthenticated func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error)
+	Tag             func(ctx context.Context, obj interface{}, next graphql.Resolver, validate *string) (res interface{}, err error)
 }
 
 type ComplexityRoot struct {
@@ -228,6 +229,7 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 	rc := graphql.GetOperationContext(ctx)
 	ec := executionContext{rc, e, 0, 0, make(chan graphql.DeferredResult)}
 	inputUnmarshalMap := graphql.BuildUnmarshalerMap(
+		ec.unmarshalInputAUser,
 		ec.unmarshalInputLoginUser,
 		ec.unmarshalInputNewTodo,
 		ec.unmarshalInputNewUser,
@@ -363,6 +365,14 @@ extend type Mutation {
 extend type Mutation {
   deleteTodo(todoId: ID!): Boolean! @isAuthenticated
 }
+
+directive @tag(validate: String) on INPUT_FIELD_DEFINITION
+
+input AUser {
+  email: String! @tag(validate: "required,email")
+  password: String! @tag(validate: "required,max=50")
+  name: String! @tag(validate: "required,max=50")
+}
 `, BuiltIn: false},
 	{Name: "../../../schema/user.graphqls", Input: `type User {
   id: ID!
@@ -398,6 +408,21 @@ var parsedSchema = gqlparser.MustLoadSchema(sources...)
 // endregion ************************** generated!.gotpl **************************
 
 // region    ***************************** args.gotpl *****************************
+
+func (ec *executionContext) dir_tag_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *string
+	if tmp, ok := rawArgs["validate"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("validate"))
+		arg0, err = ec.unmarshalOString2ᚖstring(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["validate"] = arg0
+	return args, nil
+}
 
 func (ec *executionContext) field_Mutation_createTodo_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
@@ -3192,6 +3217,98 @@ func (ec *executionContext) fieldContext___Type_specifiedByURL(ctx context.Conte
 // endregion **************************** field.gotpl *****************************
 
 // region    **************************** input.gotpl *****************************
+
+func (ec *executionContext) unmarshalInputAUser(ctx context.Context, obj interface{}) (model.AUser, error) {
+	var it model.AUser
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"email", "password", "name"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "email":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("email"))
+			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalNString2string(ctx, v) }
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				validate, err := ec.unmarshalOString2ᚖstring(ctx, "required,email")
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.Tag == nil {
+					return nil, errors.New("directive tag is not implemented")
+				}
+				return ec.directives.Tag(ctx, obj, directive0, validate)
+			}
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.(string); ok {
+				it.Email = data
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be string`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+		case "password":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("password"))
+			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalNString2string(ctx, v) }
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				validate, err := ec.unmarshalOString2ᚖstring(ctx, "required,max=50")
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.Tag == nil {
+					return nil, errors.New("directive tag is not implemented")
+				}
+				return ec.directives.Tag(ctx, obj, directive0, validate)
+			}
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.(string); ok {
+				it.Password = data
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be string`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+		case "name":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
+			directive0 := func(ctx context.Context) (interface{}, error) { return ec.unmarshalNString2string(ctx, v) }
+			directive1 := func(ctx context.Context) (interface{}, error) {
+				validate, err := ec.unmarshalOString2ᚖstring(ctx, "required,max=50")
+				if err != nil {
+					return nil, err
+				}
+				if ec.directives.Tag == nil {
+					return nil, errors.New("directive tag is not implemented")
+				}
+				return ec.directives.Tag(ctx, obj, directive0, validate)
+			}
+
+			tmp, err := directive1(ctx)
+			if err != nil {
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+			if data, ok := tmp.(string); ok {
+				it.Name = data
+			} else {
+				err := fmt.Errorf(`unexpected type %T from directive, should be string`, tmp)
+				return it, graphql.ErrorOnPath(ctx, err)
+			}
+		}
+	}
+
+	return it, nil
+}
 
 func (ec *executionContext) unmarshalInputLoginUser(ctx context.Context, obj interface{}) (model.LoginUser, error) {
 	var it model.LoginUser

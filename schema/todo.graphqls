@@ -28,3 +28,11 @@ extend type Mutation {
 extend type Mutation {
   deleteTodo(todoId: ID!): Boolean! @isAuthenticated
 }
+
+directive @tag(validate: String) on INPUT_FIELD_DEFINITION
+
+input AUser {
+  email: String! @tag(validate: "required,email")
+  password: String! @tag(validate: "required,max=50")
+  name: String! @tag(validate: "required,max=50")
+}
